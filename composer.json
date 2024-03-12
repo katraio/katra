@@ -1,0 +1,19 @@
+{
+    "name": "katra/katra",
+    "description": "Katra is a modular CMS for Laravel",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Katra\\Katra\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Derek Bourgeois",
+            "email": "derek@katra.io"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {}
+}
