@@ -20,7 +20,7 @@
     "livekit-client": "2.21.0",
     "markdown-it": "^15.0.0",
     "pusher-js": "^8.6.0",
-    "vue": "3.5.22",
+    "vue": "3.5.41",
     "vue-router": "^4.6.4"
   },
   "devDependencies": {
