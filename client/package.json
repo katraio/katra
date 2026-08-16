@@ -1,0 +1,35 @@
+{
+  "name": "katra-client",
+  "version": "0.0.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "check": "vue-tsc --noEmit",
+    "build": "vite build && node scripts/prepare-sites-build.mjs",
+    "preview": "vite preview",
+    "test:meetings": "node --experimental-strip-types --test tests/meeting-presentation.test.mjs",
+    "test:settings": "node --experimental-strip-types --test tests/settings-presentation.test.mjs",
+    "test:sites": "node --test tests/sites-worker.test.mjs"
+  },
+  "dependencies": {
+    "@lucide/vue": "1.29.0",
+    "highlight.js": "^11.11.2",
+    "laravel-echo": "^2.4.0",
+    "livekit-client": "2.21.0",
+    "markdown-it": "^15.0.0",
+    "pusher-js": "^8.6.0",
+    "vue": "3.5.22",
+    "vue-router": "^4.6.4"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "4.3.3",
+    "@types/markdown-it": "^14.1.2",
+    "@vitejs/plugin-vue": "6.0.8",
+    "tailwindcss": "4.3.3",
+    "typescript": "5.9.3",
+    "vite": "6.4.3",
+    "vue-tsc": "3.0.8"
+  }
+}

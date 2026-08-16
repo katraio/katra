@@ -1,0 +1,28 @@
+{
+    "$schema": "https://getcomposer.org/schema.json",
+    "name": "katra/livekit-laravel",
+    "description": "First-party Laravel integration for scoped LiveKit access tokens and Room Service operations.",
+    "type": "library",
+    "license": "MIT",
+    "require": {
+        "php": "^8.3",
+        "firebase/php-jwt": "^7.1",
+        "illuminate/contracts": "^12.0|^13.0",
+        "illuminate/http": "^12.0|^13.0",
+        "illuminate/support": "^12.0|^13.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Katra\\LiveKit\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Katra\\LiveKit\\LiveKitServiceProvider"
+            ]
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}

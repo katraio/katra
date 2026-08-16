@@ -1,0 +1,49 @@
+FROM php:8.4-fpm-bookworm
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        git \
+        gosu \
+        libicu-dev \
+        libpq-dev \
+        libzip-dev \
+        $PHPIZE_DEPS \
+        unzip \
+    && pecl install redis \
+    && docker-php-ext-enable redis \
+    && docker-php-ext-install -j"$(nproc)" \
+        intl \
+        opcache \
+        pcntl \
+        pdo_pgsql \
+        zip \
+    && cp "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini" \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY --from=composer:2 /usr/bin/composer /usr/local/bin/composer
+
+WORKDIR /app
+
+COPY --chown=www-data:www-data . /app
+
+RUN composer install \
+        --no-dev \
+        --no-interaction \
+        --no-progress \
+        --optimize-autoloader \
+        --prefer-dist \
+    && mkdir -p \
+        bootstrap/cache \
+        storage/app/private \
+        storage/app/public \
+        storage/framework/cache/data \
+        storage/framework/sessions \
+        storage/framework/views \
+        storage/logs \
+    && chown -R www-data:www-data bootstrap/cache storage \
+    && chmod +x docker/production-entrypoint.sh docker/production-migrate.sh
+
+EXPOSE 9000
+
+ENTRYPOINT ["docker/production-entrypoint.sh"]
+CMD ["php-fpm", "-F"]

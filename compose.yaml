@@ -1,0 +1,240 @@
+name: katra
+
+x-server-environment: &server-environment
+  APP_NAME: Katra Server
+  APP_ENV: local
+  APP_DEBUG: "true"
+  APP_URL: http://localhost:8000
+  CLIENT_URL: http://localhost:5173
+  BROADCAST_CONNECTION: reverb
+  CACHE_STORE: redis
+  DB_CONNECTION: pgsql
+  DB_HOST: postgres
+  DB_PORT: "5432"
+  DB_DATABASE: katra
+  DB_USERNAME: katra
+  DB_PASSWORD: katra
+  LOG_CHANNEL: stderr
+  LIVEKIT_API_KEY: katra-local-key
+  LIVEKIT_API_SECRET: katra-local-secret-not-for-shared-use
+  LIVEKIT_PUBLIC_URL: ws://localhost:7880
+  LIVEKIT_URL: http://livekit:7880
+  MAIL_MAILER: smtp
+  MAIL_HOST: mailpit
+  MAIL_PORT: "1025"
+  MAIL_FROM_ADDRESS: meetings@katra.local
+  MAIL_FROM_NAME: Katra
+  MEILISEARCH_HOST: http://meilisearch:7700
+  QUEUE_CONNECTION: redis
+  REGISTRATION_ENABLED: "true"
+  REDIS_HOST: redis
+  REDIS_PORT: "6379"
+  REVERB_APP_ID: katra-local
+  REVERB_APP_KEY: katra-local-key
+  REVERB_APP_SECRET: katra-local-secret
+  REVERB_HOST: reverb
+  REVERB_PORT: "8080"
+  REVERB_SCHEME: http
+  REVERB_ALLOWED_ORIGINS: localhost,127.0.0.1
+  REVERB_SERVER_HOST: 0.0.0.0
+  REVERB_SERVER_PORT: "8080"
+  SCOUT_DRIVER: meilisearch
+  SCOUT_QUEUE: "true"
+  SANCTUM_STATEFUL_DOMAINS: localhost:5173,127.0.0.1:5173,localhost:8000,127.0.0.1:8000
+  SESSION_DRIVER: redis
+
+x-server-dependencies: &server-dependencies
+  postgres:
+    condition: service_healthy
+  redis:
+    condition: service_healthy
+  meilisearch:
+    condition: service_healthy
+  mailpit:
+    condition: service_started
+  livekit:
+    condition: service_healthy
+
+services:
+  livekit:
+    image: livekit/livekit-server:v1.13.1
+    command: ["--bind", "0.0.0.0", "--node-ip", "127.0.0.1", "--logging.level", "warn"]
+    environment:
+      LIVEKIT_KEYS: "katra-local-key: katra-local-secret-not-for-shared-use"
+    ports:
+      - "127.0.0.1:7880:7880"
+      - "127.0.0.1:7881:7881"
+      - "127.0.0.1:7882:7882/udp"
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--spider", "http://127.0.0.1:7880/"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+      start_period: 10s
+
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: katra
+      POSTGRES_USER: katra
+      POSTGRES_PASSWORD: katra
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./server/docker/postgres/init-databases.sh:/docker-entrypoint-initdb.d/10-katra-testing.sh:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U katra -d katra"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+      start_period: 10s
+
+  redis:
+    image: redis:8-alpine
+    command: ["redis-server", "--appendonly", "yes"]
+    ports:
+      - "127.0.0.1:6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  meilisearch:
+    image: getmeili/meilisearch:v1.15
+    environment:
+      MEILI_ENV: development
+      MEILI_NO_ANALYTICS: "true"
+    ports:
+      - "127.0.0.1:7700:7700"
+    volumes:
+      - meilisearch_data:/meili_data
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--spider", "http://127.0.0.1:7700/health"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+      start_period: 10s
+
+  mailpit:
+    image: axllent/mailpit:v1.30
+    ports:
+      - "127.0.0.1:8025:8025"
+    environment:
+      MP_MAX_MESSAGES: "500"
+      MP_DATABASE: /data/mailpit.db
+    volumes:
+      - mailpit_data:/data
+
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    depends_on: *server-dependencies
+    environment: *server-environment
+    ports:
+      - "127.0.0.1:8000:8000"
+    volumes:
+      - ./server:/app
+      - server_vendor:/app/vendor
+    healthcheck:
+      test:
+        - CMD
+        - php
+        - -r
+        - "exit(@file_get_contents('http://127.0.0.1:8000/up') === false ? 1 : 0);"
+      interval: 5s
+      timeout: 3s
+      retries: 20
+      start_period: 60s
+
+  horizon:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    depends_on:
+      server:
+        condition: service_healthy
+    environment:
+      <<: *server-environment
+      KATRA_SKIP_SETUP: "true"
+    command: ["php", "artisan", "horizon"]
+    volumes:
+      - ./server:/app
+      - server_vendor:/app/vendor
+    healthcheck:
+      test: ["CMD", "php", "artisan", "horizon:status"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 20s
+
+  reverb:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    depends_on:
+      server:
+        condition: service_healthy
+    environment:
+      <<: *server-environment
+      KATRA_SKIP_SETUP: "true"
+    command: ["php", "artisan", "reverb:start", "--host=0.0.0.0", "--port=8080"]
+    ports:
+      - "127.0.0.1:8081:8080"
+    volumes:
+      - ./server:/app
+      - server_vendor:/app/vendor
+    healthcheck:
+      test:
+        - CMD
+        - php
+        - -r
+        - "exit(@fsockopen('127.0.0.1', 8080) === false ? 1 : 0);"
+      interval: 5s
+      timeout: 3s
+      retries: 20
+      start_period: 20s
+
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    depends_on:
+      reverb:
+        condition: service_healthy
+      server:
+        condition: service_healthy
+    environment:
+      KATRA_SERVER_URL: http://server:8000
+      VITE_REGISTRATION_ENABLED: "true"
+      VITE_REVERB_APP_KEY: katra-local-key
+      VITE_REVERB_HOST: localhost
+      VITE_REVERB_PORT: "8081"
+      VITE_REVERB_SCHEME: http
+    ports:
+      - "127.0.0.1:5173:5173"
+    volumes:
+      - ./client:/app
+      - client_node_modules:/app/node_modules
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - "fetch('http://127.0.0.1:5173').then(response => process.exit(response.ok ? 0 : 1)).catch(() => process.exit(1))"
+      interval: 5s
+      timeout: 3s
+      retries: 20
+      start_period: 30s
+
+volumes:
+  client_node_modules:
+  meilisearch_data:
+  mailpit_data:
+  postgres_data:
+  redis_data:
+  server_vendor:

@@ -1,0 +1,219 @@
+# Katra workflow definitions are portable, reviewable files.
+version: katra.workflow/v1
+id: customer-request-review
+name: Customer Request Review
+
+layout:
+  canvas:
+    width: 1800
+    height: 1100
+  manual_start:
+    x: 60
+    y: 270
+  review_request:
+    x: 370
+    y: 260
+  approved:
+    x: 700
+    y: 270
+  complete_work:
+    x: 1010
+    y: 120
+  request_changes:
+    x: 760
+    y: 560
+  confirm_outcome:
+    x: 1080
+    y: 560
+
+trigger:
+  type: manual
+
+steps:
+  - id: review_request
+    name: Review request
+    use: human_task
+    assigned_to:
+      type: team
+      role: operations
+    instructions: >-
+      Review the request and gather any missing information.
+      If anything is unclear, send it back for changes.
+    required_output: Request review
+    guidance:
+      - id: guide-visual-borders
+        text: >-
+          For web design work, do not use borders to separate sections. Use spacing and surface contrast instead.
+        category: "Experience"
+        provenance:
+          source: team_feedback
+          source_label: "Web design task · KAT-248"
+          author: "Morgan Lee"
+          recorded_at: "Aug 2, 2026"
+          visibility: internal
+      - id: guide-plain-language
+        text: >-
+          Use plain language when asking for missing information.
+        category: "Communication"
+        provenance:
+          source: team_feedback
+          source_label: "Request review · KAT-231"
+          author: "Operations team"
+          recorded_at: "Jul 29, 2026"
+          visibility: internal
+    next: approved
+
+  - id: approved
+    name: Approved?
+    use: decision
+    guidance:
+      - id: guide-review-auth
+        text: >-
+          Check authorization at the resource level, not only at the route or controller level.
+        category: "Security"
+        provenance:
+          source: team_feedback
+          source_label: "Code review · KAT-219"
+          author: "Sentinel"
+          recorded_at: "Jul 25, 2026"
+          visibility: internal
+      - id: guide-review-errors
+        text: >-
+          Review failure paths and recovery behavior, not only the happy path.
+        category: "Code quality"
+        provenance:
+          source: team_feedback
+          source_label: "Code review · KAT-219"
+          author: "Morgan Lee"
+          recorded_at: "Jul 25, 2026"
+          visibility: internal
+      - id: guide-review-tests
+        text: >-
+          Require a focused regression test for every bug fix.
+        category: "Testing"
+        provenance:
+          source: team_feedback
+          source_label: "Review feedback · KAT-207"
+          author: "Operations team"
+          recorded_at: "Jul 21, 2026"
+          visibility: internal
+      - id: guide-review-scope
+        text: >-
+          Call out unrelated changes that make the review harder to reason about.
+        category: "Delivery"
+        provenance:
+          source: team_feedback
+          source_label: "Review feedback · KAT-201"
+          author: "Morgan Lee"
+          recorded_at: "Jul 19, 2026"
+          visibility: internal
+    branches:
+      - when: approved
+        next: complete_work
+      - when: needs_changes
+        next: request_changes
+
+  - id: complete_work
+    name: Complete work
+    use: human_task
+    assigned_to:
+      type: team
+      role: operations
+    guidance:
+      - id: guide-small-changes
+        text: >-
+          Prefer small, reviewable changes that solve one bounded problem.
+        category: "Delivery"
+        provenance:
+          source: team_feedback
+          source_label: "Development task · KAT-244"
+          author: "Morgan Lee"
+          recorded_at: "Aug 1, 2026"
+          visibility: internal
+      - id: guide-existing-patterns
+        text: >-
+          Follow the repository's existing patterns before introducing a new abstraction.
+        category: "Code quality"
+        provenance:
+          source: team_feedback
+          source_label: "Development task · KAT-240"
+          author: "Artisan"
+          recorded_at: "Jul 31, 2026"
+          visibility: internal
+      - id: guide-no-driveby
+        text: >-
+          Do not include unrelated refactors or formatting changes in the same change set.
+        category: "Delivery"
+        provenance:
+          source: team_feedback
+          source_label: "Development task · KAT-237"
+          author: "Morgan Lee"
+          recorded_at: "Jul 30, 2026"
+          visibility: internal
+      - id: guide-error-paths
+        text: >-
+          Handle and test the important error paths explicitly.
+        category: "Testing"
+        provenance:
+          source: team_feedback
+          source_label: "Development task · KAT-233"
+          author: "Operations team"
+          recorded_at: "Jul 29, 2026"
+          visibility: internal
+      - id: guide-focused-tests
+        text: >-
+          Run the narrowest relevant tests first, then the broader project checks.
+        category: "Testing"
+        provenance:
+          source: team_feedback
+          source_label: "Development task · KAT-226"
+          author: "Artisan"
+          recorded_at: "Jul 27, 2026"
+          visibility: internal
+      - id: guide-no-secrets
+        text: >-
+          Never print, commit, or copy secret values into task notes or logs.
+        category: "Security"
+        provenance:
+          source: team_feedback
+          source_label: "Security review · KAT-218"
+          author: "Sentinel"
+          recorded_at: "Jul 24, 2026"
+          visibility: internal
+      - id: guide-accessible-controls
+        text: >-
+          Use semantic controls and preserve keyboard access for every interactive element.
+        category: "Experience"
+        provenance:
+          source: team_feedback
+          source_label: "Web interface task · KAT-212"
+          author: "Morgan Lee"
+          recorded_at: "Jul 23, 2026"
+          visibility: internal
+      - id: guide-explain-surprises
+        text: >-
+          Document behavior that would be surprising to the next person maintaining the code.
+        category: "Communication"
+        provenance:
+          source: team_feedback
+          source_label: "Development task · KAT-198"
+          author: "Atlas"
+          recorded_at: "Jul 18, 2026"
+          visibility: internal
+    next: confirm_outcome
+
+  - id: request_changes
+    name: Request changes
+    use: human_task
+    assigned_to:
+      type: team
+      role: operations
+    next: review_request
+
+  - id: confirm_outcome
+    name: Confirm outcome
+    use: human_task
+    assigned_to:
+      type: team
+      role: operations
+    next: complete

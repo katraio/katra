@@ -1,0 +1,41 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
+      - name: Start the development stack
+        run: docker compose up -d --build --wait
+
+      - name: Check the Server
+        run: |
+          docker compose exec -T server composer validate --strict
+          docker compose exec -T server vendor/bin/pint --test
+          docker compose exec -T server php artisan test
+
+      - name: Check the Client
+        run: |
+          docker compose exec -T client npm run check
+          docker compose exec -T client npm run build
+          docker compose exec -T client npm run test:sites
+
+      - name: Stop the development stack
+        if: always()
+        run: docker compose down --volumes

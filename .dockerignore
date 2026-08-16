@@ -1,0 +1,16 @@
+.DS_Store
+.env
+.git
+.gitignore
+**/.env
+**/.env.*
+**/.git
+**/.phpunit.cache
+**/.phpunit.result.cache
+**/bootstrap/cache/*.php
+**/dist
+**/node_modules
+**/storage/logs/*.log
+**/vendor
+katra-team-demo
+website/test

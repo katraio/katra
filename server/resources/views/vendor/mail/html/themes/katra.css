@@ -1,0 +1,171 @@
+/* Katra's Nord-derived mail theme. Keep declarations conservative for email clients. */
+body,
+body *:not(html):not(style):not(br):not(tr):not(code) {
+    box-sizing: border-box;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    position: relative;
+}
+
+body {
+    -webkit-text-size-adjust: none;
+    background-color: #242933;
+    color: #d8dee9;
+    height: 100%;
+    line-height: 1.5;
+    margin: 0;
+    padding: 0;
+    width: 100% !important;
+}
+
+p, ul, ol, blockquote { line-height: 1.5; text-align: left; }
+a { color: #c5a3c0; }
+a img { border: none; }
+img { max-width: 100%; }
+
+h1 {
+    color: #eceff4;
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 1.3;
+    margin: 0 0 18px;
+    text-align: left;
+}
+
+h2 {
+    color: #eceff4;
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1.35;
+    margin: 5px 0 18px;
+    text-align: left;
+}
+
+h3 { color: #eceff4; font-size: 16px; font-weight: 700; margin-top: 0; text-align: left; }
+p { color: #d8dee9; font-size: 16px; line-height: 1.55; margin-top: 0; text-align: left; }
+p.sub { font-size: 12px; }
+
+.wrapper {
+    -premailer-cellpadding: 0;
+    -premailer-cellspacing: 0;
+    -premailer-width: 100%;
+    background-color: #242933;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+}
+
+.content {
+    -premailer-cellpadding: 0;
+    -premailer-cellspacing: 0;
+    -premailer-width: 100%;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+}
+
+.header { padding: 34px 0 24px; text-align: center; }
+.header a { display: inline-block; text-decoration: none; }
+.katra-logo { display: block; height: auto; width: 132px; }
+
+.body {
+    -premailer-cellpadding: 0;
+    -premailer-cellspacing: 0;
+    -premailer-width: 100%;
+    background-color: #242933;
+    border: 0;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+}
+
+.inner-body {
+    -premailer-cellpadding: 0;
+    -premailer-cellspacing: 0;
+    -premailer-width: 570px;
+    background-color: #303846;
+    border: 1px solid #424c5c;
+    border-radius: 12px;
+    box-shadow: none;
+    margin: 0 auto;
+    padding: 0;
+    width: 570px;
+}
+
+.inner-body a { word-break: break-word; }
+.content-cell { max-width: 100vw; padding: 38px; }
+
+.panel { border: 0; margin: 26px 0; }
+.panel-content {
+    background-color: #3b4452;
+    border-left: 4px solid #b48ead;
+    border-radius: 8px;
+    color: #d8dee9;
+    padding: 20px 22px;
+}
+.panel-content p { color: #d8dee9; }
+.panel-item { padding: 0; }
+.panel-item p:last-of-type { margin-bottom: 0; padding-bottom: 0; }
+.meeting-label { color: #bfa0ba; font-size: 11px; font-weight: 700; letter-spacing: 1.5px; }
+.privacy-note { color: #aab4c3; font-size: 13px; line-height: 1.55; }
+
+.action {
+    -premailer-cellpadding: 0;
+    -premailer-cellspacing: 0;
+    -premailer-width: 100%;
+    float: none;
+    margin: 30px auto;
+    padding: 0;
+    text-align: center;
+    width: 100%;
+}
+
+.button {
+    -webkit-text-size-adjust: none;
+    border-radius: 8px;
+    color: #2e3440;
+    display: inline-block;
+    font-size: 15px;
+    font-weight: 700;
+    overflow: hidden;
+    text-decoration: none;
+}
+
+.button-blue, .button-primary {
+    background-color: #c0a0bb;
+    border-bottom: 11px solid #c0a0bb;
+    border-left: 24px solid #c0a0bb;
+    border-right: 24px solid #c0a0bb;
+    border-top: 11px solid #c0a0bb;
+}
+
+.button-green, .button-success {
+    background-color: #a3be8c;
+    border: 11px solid #a3be8c;
+    color: #2e3440;
+}
+
+.button-red, .button-error {
+    background-color: #bf616a;
+    border: 11px solid #bf616a;
+    color: #ffffff;
+}
+
+.subcopy { border-top: 1px solid #4c566a; margin-top: 30px; padding-top: 24px; }
+.subcopy p { color: #9ca8b8; font-size: 12px; line-height: 1.55; }
+
+.footer {
+    -premailer-cellpadding: 0;
+    -premailer-cellspacing: 0;
+    -premailer-width: 570px;
+    margin: 0 auto;
+    padding: 0;
+    text-align: center;
+    width: 570px;
+}
+.footer p { color: #768295; font-size: 12px; text-align: center; }
+.footer a { color: #909bad; text-decoration: underline; }
+
+.table table { margin: 30px auto; width: 100%; }
+.table th { border-bottom: 1px solid #4c566a; margin: 0; padding-bottom: 8px; }
+.table td { color: #d8dee9; font-size: 15px; line-height: 18px; margin: 0; padding: 10px 0; }
+.break-all { word-break: break-all; }
