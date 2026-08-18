@@ -517,6 +517,6 @@ onBeforeUnmount(() => {
 
 @media (max-width: 900px) {
   .project-workspace-header { z-index: 14; }
-  .project-switcher { margin-left: 46px; }
+  .project-header-topline { padding-left: 58px; }
 }
 </style>
