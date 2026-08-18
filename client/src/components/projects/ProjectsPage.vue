@@ -514,4 +514,9 @@ onBeforeUnmount(() => {
   .activity-timeline article > button { grid-column: 2; justify-self: start; }
   .settings-save { width: 100%; justify-content: center; }
 }
+
+@media (max-width: 900px) {
+  .project-workspace-header { z-index: 14; }
+  .project-header-topline { padding-left: 58px; }
+}
 </style>
